@@ -1,24 +1,156 @@
-from sqlalchemy.dialects.sqlite.pysqlite import _SQLite_pysqliteDate
-import spy_details
+from spy_details import spy , new_spy
+from steganography.steganography import Steganography
+from datetime import datetime
+#import spy_details
+
+# list of default Status message or the privious status
+status_message = ["Busy","Leave a message","Don't Disturb.","Help me"]
+
+# all the information of frnds stored in this list
+frnd_list = [ {"name": "sonu", "age": 22, "rating": 6, "is_online": True, "message": []},
+              {"name": "monu", "age": 23, "rating": 8, "is_online": True, "message": []}]
 
 
-def start_chat():
+def add_status(status):  # function for adding a status.
+    if status != None:
+        print "\n     Your current status is " + status
+    else:
+        print "\n       You don't have any status currently.\n"
+
+    existing_status = raw_input("\nYou want to select from old status ?  Y/N: ")
+
+    if existing_status.upper() == "N":
+        new_status = raw_input("\nEnter Your status: ")
+        if len(new_status)>0:
+            status_message.append(new_status)  # adding the new status  to the list of status message .
+            print "\nYour Status was Updates Successfully."
+            return new_status
+        else:
+            print "Enter a valid Status."
+
+    elif existing_status.upper()=="Y":
+        count = 1  # using this variable for numbering of lines.
+
+        for i in status_message:   # for loop for printing the list of previous status.
+            print str(count) + ". " + i
+            count = count + 1
+
+        user_choice = input("\nEnter your choice: ")
+        print "\nYour Status was Updates Successfully."
+        new_status = status_message[user_choice - 1]
+        return new_status
+
+
+def add_frnd(): # function for adding a friend.
+    frnd = { "name": "",
+             "age": 0,
+             "rating": 0.0,
+             "is_online": True,
+             "message": []
+        }
+
+    # saving the input in the friend list
+    frnd["name"] = raw_input("Enter your friend name: ")
+    frnd["age"] = input("Enter your friend age: ")
+    frnd["rating"] = input("Enter your friend rating: ")
+
+    if len(frnd["name"]) > 2 and frnd["age"] > 14:  # validating name and age
+        frnd_list.append(frnd)
+        print "You have successfully added a friend."
+
+    else:
+        print "The friend cannot be added "
+
+    return len(frnd_list)  # return the total number of frind in the list.
+
+
+def select_a_frnd():  # this method print the name of friends and take the user input.
+    count = 1
+    for i in frnd_list:
+        print str(count) + ". " + i["name"]
+        count = count + 1
+    select = input("Enter your choice: ")
+    return select - 1  # index of this frnd in the list is one less than the user input, because list starts from 0 index.
+
+
+def send_message():
+    selected_frnd = select_a_frnd()  # selecting the friend.
+
+    # creating the variables for encode function
+    original_image = raw_input("What is tha name of your original image: ")
+    text = raw_input("What is your secret text? ")
+    output_path = "output.jpg"
+
+    # this function encode the meessage or hide the message in a image.
+    Steganography.encode(original_image,output_path,text)
+    print "Your secret message is ready!"
+
+    # saving the message send by Spy.
+    new_chat = {
+        "message": text,
+        "time": datetime.now(),
+        "sent_by_me": True
+    }
+    frnd_list[selected_frnd]["message"].append(new_chat)
+
+
+def read_message():
+    selected_frnd = select_a_frnd()
+    output_path = raw_input("Which image you want to decode? ")
+    text = Steganography.decode(output_path)
+    print "Secret text is ::: " + text
+    new_chat = {
+        "message": text,
+        "time": datetime.now(),
+        "sent_by_me": False
+    }
+    frnd_list[selected_frnd]["message"].append(new_chat)
+    print "Your secret message has been saved!\n"
+
+#        I WANT TO PRINT ALL THE MESSAGES HE RECEIVED .
+#    read = raw_input("You want to read all messages? Y/N ")
+#    if read.upper() == "Y":
+#        count = 1
+#        for i in frnd_list[selected_frnd]["message"]:
+#            print str(count) + ". " + i
+#            count = count + 1
+
+
+def menu():
+    current_status = None  # current status of the spy
+
     show_menu = True
 
     # While Loop -> Display options until Spy will quit.
     while show_menu:
         # Different options for the Spy
-        print "                  1. Add a Status\n" \
-              "                  2. Add a Friend \n" \
-              "                  0. Exit\n"
-        choice = input("Choose your option :")
+        print "\n                  1) Add a status update \n" \
+              "                  2) Add a friend \n" \
+              "                  3) Send a secret message \n" \
+              "                  4) Read a secret message \n" \
+              "                  5) Read chats from a user \n" \
+              "                  6) Close application \n"
+        choice = input("Choose your option : ")
         if choice == 1:
-            print "\n       Will Add a Status.\n"
+
+            current_status = add_status(current_status)
+            print "\nYour updated status is: " + current_status + "\n"
 
         elif choice == 2:
-            print "\n       Will Add a Friends.\n"
 
-        elif choice == 0:
+           no_of_frnds = add_frnd()
+           print "\nYour have " + str(no_of_frnds) + " friends.\n"
+
+        elif choice == 3:
+            send_message()
+
+        elif choice == 4:
+            read_message()
+
+        elif choice == 5:
+            print ("Not Done Till now.")
+
+        elif choice == 6:
             print "\n       Thanks For Using Spy Chat.\n"
             show_menu = False
 
@@ -32,15 +164,15 @@ def login():  # A function for login.
     spy_name2 = raw_input("Enter your name : ")
 
     # verifying Spy name
-    if spy_name2 == spy_details.name:
-        print "Welcome Back Mr. %s , Age: %d , Rating: %.1f .\n" % (spy_details.name, spy_details.age, spy_details.rating)
-        print "                 Here is your options.\n"
-        start_chat()
+    if spy_name2 == spy["name"]:
+        print "Welcome Back, Mr. %s , Age: %d , Rating: %.1f .\n" % (spy["name"], spy["age"], spy["rating"])
+        print "     Here is your options.\n"
+        menu()
 
-    elif spy_name2 == name1:
-        print "Welcome back %s\n" % (name1)
-        print "                 Here is your options.\n"
-        start_chat()
+    elif spy_name2 == new_spy["name"]:
+        print "Welcome Back, %s %s , Age: %d , Rating: %.1f .\n" % (new_spy["salutation"],new_spy["name"] , new_spy["age"] , new_spy["rating"])
+        print "     Here is your options.\n"
+        menu()
 
     # this is not working -------> WHY  ?
     else:
@@ -103,10 +235,14 @@ if question.upper() == "Y":
 
                     spy_is_online = True
                     # print "Authentication complete. \nWelcome " +spy_name+ ", Age: " +str(age)+ ", Rating: " +str(rating)
-                    print "Authentication complete. \nWelcome %s , Age: %d , Rating: %.1f .\n" % (spy_name,age,rating) # String formatting using placeholders
+                    print "Authentication complete. \nWelcome %s %s , Age: %d , Rating: %.1f .\n" % (salutation,spy_name,age,rating) # String formatting using placeholders
 
-                    spy_details.id1(spy_name,salutation, age, rating)
-                    name1 = spy_details.id1(spy_name,salutation,age,rating)
+                    new_spy["name"] = spy_name
+                    new_spy["salutation"] = salutation
+                    new_spy["age"] = age
+                    new_spy["rating"] = rating
+                    #spy_details.id1(spy_name,salutation, age, rating)
+                    #name1 = spy_details.id1(spy_name,salutation,age,rating)
                     login()
 
             else:
@@ -122,7 +258,7 @@ if question.upper() == "Y":
 
 elif question.upper() == "N":
     # praveen is the default user.
-    print "Welcome Back Mr. %s\n" % (spy_details.name)
+    print "Welcome Back Mr. %s\n" % (spy["name"])
     login()
 
 else:
