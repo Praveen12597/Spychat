@@ -1,0 +1,5 @@
+name, salutation, rating, age, is_online,user
+saurabh,mr.,8,23,True,praveen
+praveen,mr.,9,19,True,saurabh
+yogesh,mr.,7,43,True,praveen
+prrey,ms.,5,45,True,praveen

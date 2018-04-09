@@ -1,31 +1,36 @@
-spy = {
-    "name": "praveen",
-    "rating": 8.5,
-    "age": 20
-}
-
-#name = "praveen"
-#rating = 8.5
-#age = 20
+from datetime import datetime
 
 
-new_spy = {
-    "name": "name1",
-    "salutation": "Mr.",
-    "rating": 0.0,
-    "age": 00
-}
+class spy:
+
+    # cresting constructor for this class
+    def __init__(self, name, salutation, age, rating):
+        # self.name = salutation + " " + name
+        self.name = name
+        self.salutation = salutation
+        self.age = age
+        self.rating = rating
+        self.is_online = True
+        self.chat = []
+        self.current_status_message = None
 
 
-def id1(n, s, r, a):
-    spy_name1 = n
-    spy_salutation1 = s
-    spy_rating1 = r
-    spy_age1 = a
-    return spy_name1
+# creating object
+spy1 = spy("praveen", "Mr." , 19 , 9 )
+
+# chat class
+class chatmessage:
+
+    def __init__(self, message, sent_by_me, sender, recever):
+        self.message = message
+        self.time = datetime.now()
+        self.sent_by_me = sent_by_me
+        self.sender = sender
+        self.recever = recever
 
 
-# 108  -  need modification
-# convert this function to the list. then i can call any variable saperately .
-# after that modify "def login" .
+class id:
 
+    def __init__(self,id,password):
+        self.id = id
+        self.password = password
